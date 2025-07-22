@@ -17,13 +17,14 @@ jobs:
         run: |
           echo "Last updated: $(date -u +%s%N)" > daily-update.txt
 
-      - name: Set up Git
+      - name: Set up Git identity
         run: |
-          git config user.name "SharkFishDeveloper"
-          git config user.email "shahzebakhtart66@gmail.com"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Commit and Push changes
         run: |
           git add daily-update.txt
           git commit -m "Auto update: $(date -u)" || echo "⚠️ Nothing to commit"
-          git push
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin HEAD:main
