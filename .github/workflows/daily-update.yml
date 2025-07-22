@@ -29,8 +29,9 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.name "SharkFishDeveloper"
+            git config user.email "shahzebakhtart66@gmail.com" 
+
 
       - name: Commit and Push changes
         run: |
