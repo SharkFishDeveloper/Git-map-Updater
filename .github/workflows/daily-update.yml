@@ -1,0 +1,29 @@
+name: Daily File Update
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  update-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Update file
+        run: |
+          echo "Last updated: $(date -u)" > daily-update.txt
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and Push changes
+        run: |
+          git add daily-update.txt
+          git commit -m "Daily update: $(date -u)" || echo "No changes to commit"
+          git push
