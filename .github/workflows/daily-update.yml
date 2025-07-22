@@ -2,7 +2,7 @@ name: Daily-ish File Update
 
 on:
   schedule:
-    - cron: '1 * * * *'  # Runs every hour at minute 1
+    - cron: '*/30 * * * *'  # Runs every hour at minute 1
   workflow_dispatch:
 
 jobs:
