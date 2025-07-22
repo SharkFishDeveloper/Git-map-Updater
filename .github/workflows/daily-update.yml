@@ -1,21 +1,31 @@
-name: Daily File Update
+name: Daily-ish File Update
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch: # Allows manual trigger
+    - cron: '1 * * * *'  # Runs every hour at minute 1
+  workflow_dispatch:
 
 jobs:
   update-file:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Random run decision
+        run: |
+          RANDOM_NUMBER=$((RANDOM % 5))
+          echo "Random number: $RANDOM_NUMBER"
+          if [ "$RANDOM_NUMBER" -ne 0 ]; then
+            echo "🛑 Skipping this run based on random decision."
+            exit 0
+          fi
+          echo "✅ Proceeding with update."
+
       - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Update file
         run: |
-          echo "Last updated: $(date -u)" > daily-update.txt
+          echo "Last updated: $(date -u +%s)" > daily-update.txt
 
       - name: Set up Git
         run: |
@@ -25,5 +35,10 @@ jobs:
       - name: Commit and Push changes
         run: |
           git add daily-update.txt
-          git commit -m "Daily update: $(date -u)" || echo "No changes to commit"
-          git push
+          if git diff --cached --quiet; then
+            echo "⚠️ No changes to commit."
+          else
+            git commit -m "Random update: $(date -u)"
+            git push
+            echo "✅ File committed and pushed successfully."
+          fi
