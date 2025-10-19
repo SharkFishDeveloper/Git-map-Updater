@@ -2,13 +2,13 @@ name: Daily File Update
 
 on:
   schedule:
-    - cron: '0 1 * * *'
-    - cron: '0 3 * * *'
-    - cron: '0 7 * * *'
-    - cron: '0 11 * * *'
-    - cron: '0 15 * * *'
-    - cron: '0 19 * * *'
-    - cron: '0 22 * * *'
+    - cron: '0 1 * * *'   # 1:00 AM UTC
+    - cron: '0 3 * * *'   # 3:00 AM UTC
+    - cron: '0 7 * * *'   # 7:00 AM UTC
+    - cron: '0 11 * * *'  # 11:00 AM UTC
+    - cron: '0 15 * * *'  # 3:00 PM UTC
+    - cron: '0 19 * * *'  # 7:00 PM UTC
+    - cron: '0 22 * * *'  # 10:00 PM UTC
   workflow_dispatch:
 
 jobs:
@@ -19,25 +19,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Randomize whether to commit
+      - name: Decide whether to commit today
         id: should_commit
         run: |
-          # Generate a random number between 1 and 10
-          RANDOM_NUM=$((1 + RANDOM % 10))
-          echo "Random number: $RANDOM_NUM"
-
-          # ~40% chance of committing (if 1 to 4)
-          if [ "$RANDOM_NUM" -le 4 ]; then
-            echo "commit_today=true" >> $GITHUB_OUTPUT
-          else
+          RANDOM=$((RANDOM % 2))  # 50% chance
+          echo "Random result: $RANDOM"
+          if [ "$RANDOM" -eq 0 ]; then
             echo "commit_today=false" >> $GITHUB_OUTPUT
+          else
+            echo "commit_today=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Set up Git identity
         if: steps.should_commit.outputs.commit_today == 'true'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Update file
         if: steps.should_commit.outputs.commit_today == 'true'
